@@ -1,13 +1,15 @@
 ## Language bindings ##
 
 # C++ INTERFACE LIBRARY
+find_package(Boost)
 
 option(BUILD_CXX_INTERFACE "Build the C++ interface library" ON)
 option(BUILD_PYTHON_INTERFACE "Build the Python interface (needs BUILD_CXX_INTERFACE)" ON)
 option(BUILD_JAVA_INTERFACE "Build the Java interface (needs BUILD_CXX_INTERFACE)" ON)
 option(BUILD_LUA_INTERFACE "Build the Lua interface (needs BUILD_CXX_INTERFACE)" ON)
 
-if(BUILD_CXX_INTERFACE)
+
+if(BUILD_CXX_INTERFACE AND Boost_FOUND)
     message(STATUS "Building C++ interface library.")
     set(libcsnd6_SRCS
         CppSound.cpp
@@ -18,6 +20,7 @@ if(BUILD_CXX_INTERFACE)
         filebuilding.cpp)
 
     set(libcsnd6_LIBS ${LIBSNDFILE_LIBRARY} )
+	include_directories(${Boost_INCLUDE_DIRS})
 
     if(WIN32 AND NOT MSVC)
       list(APPEND libcsnd6_LIBS "${LIBSNDFILE_SUPPORT_LIBS}")
@@ -36,15 +39,26 @@ if(BUILD_CXX_INTERFACE)
         LIBRARY_OUTPUT_DIRECTORY ${BUILD_LIB_DIR}
         ARCHIVE_OUTPUT_DIRECTORY ${BUILD_LIB_DIR}
         )
+
+   if(APPLE)
+    add_compiler_flags("-std=c++11" TARGETS libcsnd6)
+   endif()
+
+
     if(${libcsnd6_CFLAGS})
         add_compiler_flags(${libcsnd6_CFLAGS} TARGETS libcsnd6)
     endif()
 
+   
+
     install(TARGETS libcsnd6
         LIBRARY DESTINATION "${LIBRARY_INSTALL_DIR}"
         ARCHIVE DESTINATION "${LIBRARY_INSTALL_DIR}")
-
+else()
+ message(STATUS "NOT Building C++ interface library.")
 endif()
+
+
 
 
 # SWIG INTERFACES
@@ -90,7 +104,7 @@ if(BUILD_PYTHON_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_LUA_INTERFACE)
           if(NOT MSVC)
             set(swigpython_LIBS ${CSOUNDLIB} ${LIBSNDFILE_LIBRARY} ${LIBSNDFILE_SUPPORT_LIBS} ${PYTHON_LIBRARY} libcsnd6)
           else()
-            set(swigpython_LIBS ${CSOUNDLIB} ${LIBSNDFILE_LIBRARY} ${PYTHON_LIBRARY} libcsnd6)
+            set(swigpython_LIBS ${CSOUNDLIB} ${LIBSNDFILE_LIBRARY} ${PYTHON_LIBRARY} libcsnd)
           endif()
         else()
             # Note: Do not link to PYTHON_LIBRARY so that it can be loaded in any python

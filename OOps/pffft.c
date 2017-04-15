@@ -61,7 +61,6 @@
 #include "pffft.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
 #include <assert.h>
 
 /* detect compiler flavour */
@@ -70,6 +69,11 @@
 #elif defined(__GNUC__)
 #  define COMPILER_GCC
 #endif
+
+#ifdef COMPILER_MSVC 
+#define _USE_MATH_DEFINES
+#endif
+#include <math.h>
 
 #if defined(COMPILER_GCC)
 #  define ALWAYS_INLINE(return_type) inline return_type __attribute__ ((always_inline))
@@ -149,7 +153,7 @@ typedef __m128 v4sf;
 /*
   ARM NEON support macros
 */
-#elif !defined(PFFFT_SIMD_DISABLE) && defined(__arm__) 
+#elif !defined(PFFFT_SIMD_DISABLE) && (defined(__arm__) || defined(IOS))
 #  include <arm_neon.h>
 typedef float32x4_t v4sf;
 #  define SIMD_SZ 4
@@ -174,7 +178,7 @@ typedef float32x4_t v4sf;
 #  define VALIGNED(ptr) ((((long)(ptr)) & 0x3) == 0)
 #else
 #  if !defined(PFFFT_SIMD_DISABLE)
-#    warning "building with simd disabled !\n";
+#    warning "building with simd disabled !!!!!!!!!!!!!!\n";
 #    define PFFFT_SIMD_DISABLE // fallback to scalar code
 #  endif
 #endif
@@ -1767,8 +1771,6 @@ void pffft_zconvolve_accumulate(PFFFT_Setup *s, const float *a, const float *b, 
     ((v4sf_union*)vab)[1].f[0] = abi + ai*bi*scaling;
   }
 }
-
-
 #else // defined(PFFFT_SIMD_DISABLE)
 
 // standard routine using scalar floats, without SIMD stuff.

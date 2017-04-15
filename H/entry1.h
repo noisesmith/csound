@@ -62,8 +62,9 @@
 #define S(x)    sizeof(x)
 
 int     ihold(CSOUND *, void *), turnoff(CSOUND *, void *);
-int     assign(CSOUND *, void *), rassign(CSOUND *, void *);
-int     aassign(CSOUND *, void *);
+int     gaassign(CSOUND *, void *), rassign(CSOUND *, void *);
+int     aassign(CSOUND *, void *), laassign(CSOUND *, void *);
+int     assign(CSOUND *, void *);
 int     init(CSOUND *, void *), ainit(CSOUND *, void *);
 int     minit(CSOUND *, void *), mainit(CSOUND *, void *);
 /* int     tinit(CSOUND *, void *), tassign(CSOUND *, void *); */
@@ -168,23 +169,7 @@ int     evrset(CSOUND *, void *), knvlpxr(CSOUND *, void *);
 int     envlpxr(CSOUND *, void *), phsset(CSOUND *, void *);
 int     ephsset(CSOUND *, void *), ephsor(CSOUND *, void *);
 int     kphsor(CSOUND *, void *), phsor(CSOUND *, void *);
-int     itablew1(CSOUND *, void *), itablegpw1(CSOUND *, void *);
-int     itablemix1(CSOUND *, void *), itablecopy1(CSOUND *, void *);
-int     itable(CSOUND *, void *), itabli(CSOUND *, void *);
-int     itabl3(CSOUND *, void *), tabl3(CSOUND *, void *);
-int     ktabl3(CSOUND *, void *), tblset(CSOUND *, void *);
-int     ktable(CSOUND *, void *), ktabli(CSOUND *, void *);
-int     tabli(CSOUND *, void *), tablefn(CSOUND *, void *);
-int     pitable(CSOUND *, void *), pitabli(CSOUND *, void *);
-int     pitabl3(CSOUND *, void *), ptabl3(CSOUND *, void *);
-int     pktabl3(CSOUND *, void *), itblchkw(CSOUND *, void *);
-int     pktable(CSOUND *, void *), pktabli(CSOUND *, void *);
-int     ptabli(CSOUND *, void *), ptablefn(CSOUND *, void *);
-int     tblsetkt(CSOUND *, void *), ktablekt(CSOUND *, void *);
-int     pitablew(CSOUND *, void *), ptblsetw(CSOUND *, void *);
-int     pktablew(CSOUND *, void *), ptablew(CSOUND *, void *);
-int     tablekt(CSOUND *, void *), ktablikt(CSOUND *, void *);
-int     tablikt(CSOUND *, void *), ko1set(CSOUND *, void *);
+int     ko1set(CSOUND *, void *);
 int     kosc1(CSOUND *, void *), kosc1i(CSOUND *, void *);
 int     oscnset(CSOUND *, void *), osciln(CSOUND *, void *);
 int     oscset(CSOUND *, void *), koscil(CSOUND *, void *);
@@ -237,10 +222,11 @@ int     inq(CSOUND *, void *), inh(CSOUND *, void *);
 int     ino(CSOUND *, void *), in16(CSOUND *, void *);
 int     in32(CSOUND *, void *), outarr(CSOUND *, void *);
 int     inch_opcode(CSOUND *, void *), inall_opcode(CSOUND *, void *);
-int     outmultiple(CSOUND *, void *);
+int     inch_set(CSOUND*, void*), outmultiple(CSOUND *, void *);
 /* int     out(CSOUND *, void *), outs(CSOUND *, void *); */
 int     outs1(CSOUND *, void *), outs2(CSOUND *, void *);
-/* int     outq(CSOUND *, void *); */
+int     och2(CSOUND *, void *), och3(CSOUND *, void *);
+int     och4(CSOUND *, void *), ochn(CSOUND *, void *);
 int     outq1(CSOUND *, void *), outq2(CSOUND *, void *);
 int     outq3(CSOUND *, void *), outq4(CSOUND *, void *);
 /* int     outh(CSOUND *, void *), outo(CSOUND *, void *); */
@@ -461,7 +447,8 @@ int table_wa(CSOUND *csound, TABLWA *p);
 int tablkt_setup(CSOUND *csound, TABL *p);
 int diskin_init(CSOUND *csound, DISKIN2 *p);
 int diskin_init_S(CSOUND *csound, DISKIN2 *p);
-int inch_opcode1(CSOUND *csound, INCH1 *p);
+int inch1_set(CSOUND *csound, void *p);
+int inch_opcode1(CSOUND *csound, void *p);
 int adset_S(CSOUND *csound, void *p);
 int lprdset_S(CSOUND *csound, void *p);
 int pvsfreadset_S(CSOUND *csound, void *p);
@@ -469,3 +456,5 @@ int alnnset(CSOUND *csound, void *p);
 int alnrset(CSOUND *csound, void *p);
 int aevxset(CSOUND *csound, void *p);
 int aevrset(CSOUND *csound, void *p);
+int midiarp_set(CSOUND *, void *);
+int midiarp(CSOUND *, void *);

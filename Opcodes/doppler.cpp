@@ -26,6 +26,8 @@
 #include <list>
 #include <vector>
 
+using namespace csound;
+
 /* ***************  does not deal with unaligned signals ************** */
 // Why not use the constants already defined?
 static MYFLT pi = std::atan(1.0) * MYFLT(4.0);
@@ -294,12 +296,8 @@ extern "C"
       }
     };
 
-  PUBLIC int csoundModuleCreate(CSOUND *csound)
-  {
-    return 0;
-  }
 
-  PUBLIC int csoundModuleInit(CSOUND *csound)
+  PUBLIC int csoundModuleInit_doppler(CSOUND *csound)
   {
     int status = 0;
     for(OENTRY *oentry = &oentries[0]; oentry->opname; oentry++)
@@ -313,6 +311,16 @@ extern "C"
                                        (int (*)(CSOUND*,void*)) oentry->aopadr);
       }
     return status;
+  }
+#ifndef PNACL
+  PUBLIC int csoundModuleCreate(CSOUND *csound)
+  {
+    return 0;
+  }
+  
+  PUBLIC int csoundModuleInit(CSOUND *csound)
+  {
+      return csoundModuleInit_doppler(csound);
   }
 
   PUBLIC int csoundModuleDestroy(CSOUND *csound)
@@ -336,4 +344,5 @@ extern "C"
   }
     return 0;
   }
+#endif
 }

@@ -28,6 +28,7 @@
 #include <vector>
 
 using namespace std;
+using namespace csound;
 
 extern "C"
 {
@@ -35,6 +36,40 @@ extern "C"
 #include <lauxlib.h>
 #include <lualib.h>
 }
+
+// These redefinitions are required because for Android,
+// LuaJIT is built with gcc for the GNU runtime library;
+// but LuaCsound is built with the NDK for the bionic runtime library.
+
+#if defined(__ANDROID__)
+extern "C"
+{
+    #undef stdin
+    FILE *stdin  = &__sF[0];
+    #undef stdout
+    FILE *stdout = &__sF[1];
+    #undef stderr
+    FILE *stderr = &__sF[2];
+    volatile int * __errno_location(void)
+    {
+        return __errno();
+    }
+    int _IO_getc(FILE *file_)
+    {
+        return getc(file_);
+    }
+    int _IO_putc(int char_, FILE *file_)
+    {
+        return putc(char_, file_);
+    }
+    int __isoc99_fscanf (FILE *stream, const char *format, ...)
+    {
+        va_list arg;
+        va_start (arg, format);
+        return vfscanf(stream, format, arg);
+    }
+}
+#endif
 
 /**
  * L U A   O P C O D E S   F O R   C S O U N D
@@ -62,8 +97,17 @@ struct keys_t
     int noteoff_key;
 };
 
-static pthread_mutex_t lc_getrefkey = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t lc_manageLuaState = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t &get_refkey()
+{
+    static pthread_mutex_t lc_getrefkey = PTHREAD_MUTEX_INITIALIZER;
+    return lc_getrefkey;
+}
+
+static pthread_mutex_t &get_manageLuaState()
+{
+    static pthread_mutex_t lc_manageLuaState = PTHREAD_MUTEX_INITIALIZER;
+    return lc_manageLuaState;
+}
 
 struct CriticalSection
 {
@@ -91,7 +135,7 @@ keys_t &manageLuaReferenceKeys(const lua_State *L,
                     std::map<std::string, keys_t> > luaReferenceKeys;
     keys_t *keys = 0;
     {
-        CriticalSection criticalSection(lc_getrefkey);
+        CriticalSection criticalSection(get_refkey());
         switch(operation)
         {
         case 'O':
@@ -134,7 +178,7 @@ bool operator == (const LuaStateForThread& a, const LuaStateForThread &b)
 lua_State *manageLuaState(char operation)
 {
     static std::vector<LuaStateForThread> luaStatesForThreads;
-    CriticalSection criticalSection(lc_manageLuaState);
+    CriticalSection criticalSection(get_manageLuaState());
     LuaStateForThread luaStateForThread;
     luaStateForThread.thread = pthread_self();
     std::vector<LuaStateForThread>::iterator it =

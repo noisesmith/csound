@@ -153,6 +153,7 @@ def runTest():
         ["udo/fail_no_xout.csd", "fail due to no xout", 1],
         ["udo/fail_invalid_xin.csd", "fail due to invalid xin", 1],
         ["udo/fail_invalid_xout.csd", "fail due to invalid xout", 1],
+        ["udo/test_udo_xout_const.csd", "Constants as xout inputs work"],
     ]
 
     tests += arrayTests
@@ -160,6 +161,8 @@ def runTest():
 
     output = ""
     tempfile = "/tmp/csound_test_output.txt"
+    if(os.sep == '/' and os.name == 'nt'):
+        tempfile = 'csound_test_output.txt'
     counter = 1
 
     retVals = []
@@ -172,7 +175,7 @@ def runTest():
         desc = t[1]
         expectedResult = (len(t) == 3) and 1 or 0
 
-        if(os.sep == '\\'):
+        if(os.sep == '\\' or os.name == 'nt'):
             executable = (csoundExecutable == "") and "..\csound.exe" or csoundExecutable
             command = "%s %s %s %s 2> %s"%(executable, parserType, runArgs, filename, tempfile)
             print command

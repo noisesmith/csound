@@ -3,6 +3,8 @@
 #include <vector>
 #include "interlocks.h"
 
+using namespace csound;
+
 // Define ENABLE_MIXER_IDEBUG to enable i-rate debug messages.
 //#define ENABLE_MIXER_IDEBUG
 
@@ -373,12 +375,8 @@ extern "C"
     { NULL, 0, 0, 0, NULL, NULL, (SUBR) NULL, (SUBR) NULL, (SUBR) NULL }
   };
 
-  PUBLIC int csoundModuleCreate(CSOUND *csound)
-  {
-    return 0;
-  }
 
-  PUBLIC int csoundModuleInit(CSOUND *csound)
+  PUBLIC int csoundModuleInit_mixer(CSOUND *csound)
   {
     OENTRY  *ep = (OENTRY*) &(localops[0]);
     int     err = 0;
@@ -394,6 +392,16 @@ extern "C"
     }
     return err;
   }
+#ifndef PNACL
+  PUBLIC int csoundModuleInit(CSOUND *csound)
+  {
+      return csoundModuleInit_mixer(csound);
+  }
+    PUBLIC int csoundModuleCreate(CSOUND *csound)
+  {
+    return 0;
+  }
 
+#endif
 }   // END EXTERN C
 

@@ -38,8 +38,8 @@ static int tanhtable(FGDATA *ff, FUNC *ftp)
     for (i = 0, x = start; i <= (int) ftp->flen; i++, x += step)
       fp[i] = TANH(x);
 
-    if (resc!=FL(0.0)) ff->e.p[4] = -1;
-    else ff->e.p[4] = 1;
+    if (resc!=FL(0.0)) ff->e.p[4] *= -1;
+    /*else ff->e.p[4] = 1;*/
     return OK;
 }
 
@@ -57,8 +57,8 @@ static int exptable(FGDATA *ff, FUNC *ftp)
     for (i = 0, x = start; i <= (int) ftp->flen; i++, x += step)
       fp[i] = EXP(x);
 
-    if (resc!=FL(0.0)) ff->e.p[4] = -1;
-    else ff->e.p[4] = 1;
+    if (resc!=FL(0.0)) ff->e.p[4] *= -1;
+    /*else ff->e.p[4] = 1;*/
     return OK;
 }
 
@@ -83,8 +83,8 @@ static int sonetable(FGDATA *ff, FUNC *ftp)
       printf("%f -> %f\n", x, fp[i]);
     }
 
-    if (resc!=FL(0.0)) ff->e.p[4] = -1;
-    else ff->e.p[4] = 1;
+    if (resc!=FL(0.0)) ff->e.p[4] *= -1;
+    /*else ff->e.p[4] = 1;*/
     return OK;
 }
 
@@ -131,7 +131,7 @@ static int wavetable(FGDATA *ff, FUNC *ftp)
       csound->Warning(csound, Str("insufficient arguments"));
     fp_filter = srcfil->ftable;
     newLen  = srcfil->flen;
-    mirr = (MYFLT*)malloc(sizeof(MYFLT)*srcfil->flen);
+    mirr = (MYFLT*) csound->Malloc(csound, sizeof(MYFLT)*srcfil->flen);
     pnewLen = &newLen;
     pwaveS  = &wave;
     pwaveS->pSF  = fp_filter;
@@ -142,11 +142,11 @@ static int wavetable(FGDATA *ff, FUNC *ftp)
       pwaveS->pWF[i] = POWER(FL(-1.0),i)*pwaveS->pSF[srcfil->flen-1-i];
     pwaveS->pFil[0] = pwaveS->pSF;
     pwaveS->pFil[1] = pwaveS->pWF;
-    pInp = (MYFLT*)calloc(ftp->flen, sizeof(MYFLT));
-    pBuf = (MYFLT*)calloc(ftp->flen, sizeof(MYFLT));
+    pInp = (MYFLT*) csound->Calloc(csound, ftp->flen* sizeof(MYFLT));
+    pBuf = (MYFLT*) csound->Calloc(csound, ftp->flen* sizeof(MYFLT));
     *pInp = FL(1.0);
     steps = (int)LOG2(ftp->flen/srcfil->flen);
-    xfree = pOrder = (int*)malloc(sizeof(int)*steps);
+    xfree = pOrder = (int*)csound->Malloc(csound, sizeof(int)*steps);
     /* DEC to BIN */
     for (i = 0; i < steps; i++)
       pOrder[i] = ((int)order>>i) & 0x1;
@@ -155,10 +155,10 @@ static int wavetable(FGDATA *ff, FUNC *ftp)
       deconvolve(pInp, pwaveS, pnewLen, pBuf, pOrder++);
     for (i = 0; i < *pnewLen; i++)
       fp[i] = pInp[i];
-    free(pBuf); free(pInp);
-    free(xfree); free(mirr);
-    if (resc!=FL(0.0)) ff->e.p[4] = -1;
-    else ff->e.p[4] = 1;
+    csound->Free(csound,pBuf); csound->Free(csound,pInp);
+    csound->Free(csound,xfree); csound->Free(csound,mirr);
+    if (resc!=FL(0.0)) ff->e.p[4] *= -1;
+    /*else ff->e.p[4] = 1;*/
     return OK;
 }
 
